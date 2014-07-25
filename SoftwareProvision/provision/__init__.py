@@ -21,6 +21,7 @@ import re
 import platform
 
 from UbuntuProvision import UbuntuProvision
+from centosProvision import centosProvision
 
 # Define the function in case waagent(<2.0.4) doesn't have DistInfo()
 def DistInfo(fullname=0):

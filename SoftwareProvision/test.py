@@ -33,7 +33,7 @@ from provision import *
 # Global variables definition
 ExtensionShortName = 'SoftwareProvision'
 
-test_settings = ['lnmp']
+test_settings = ['lamp']
 
 def install():
     hutil.do_parse_context('Install')

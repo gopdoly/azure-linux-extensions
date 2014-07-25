@@ -45,10 +45,32 @@ class centosProvision(AbstractProvision):
 
         os.system("yum -y install php php-mysql")
         os.system("/etc/init.d/httpd restart")
-        with open("/var/www/html/info.php", "w") as f:
+
+        #get http root
+        with open("/etc/httpd/conf/httpd.conf") as f:
+            conf = f.read()
+        for line in conf.split('\n'):
+            if line.strip().startswith('DocumentRoot '):
+                self.http_root = line.split(' ')[1].strip('"') + '/'
+                break
+        with open(self.http_root + "info.php", "w") as f:
             f.write("<?php\nphpinfo();\n?>")
+
+        #set mysql password
+        os.system("mysqladmin -u root password " + self.mysql_password)
+
+        #config iptables
+        with open("/etc/sysconfig/iptables") as f:
+            conf = f.read()
+        conf = conf.split('\n')
+        pos = conf.index("-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT")
+        if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT" in conf:
+            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
+        if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT" in conf:
+            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
+        os.system("service iptables restart")
         
 if __name__ == '__main__':
-    a = centosConfigure()
+    a = centosProvision(None)
     a.install_lamp()
         
