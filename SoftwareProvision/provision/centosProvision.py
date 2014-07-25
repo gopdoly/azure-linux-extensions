@@ -31,6 +31,7 @@ import datetime
 
 from Utils.WAAgentUtil import waagent
 import Utils.HandlerUtil as Util
+from AbstractProvision import AbstractProvision
 
 class centosProvision(AbstractProvision):
     def install_lamp(self):
