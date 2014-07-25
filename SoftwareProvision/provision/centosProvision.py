@@ -56,10 +56,6 @@ class centosProvision(AbstractProvision):
         with open(self.http_root + "info.php", "w") as f:
             f.write("<?php\nphpinfo();\n?>")
 
-        #set authority
-        os.system("chcon -R -h -t httpd_sys_content_t /var/www/html/")
-        os.system("/etc/init.d/httpd restart")
-
         #set mysql password
         os.system("mysqladmin -u root password " + self.mysql_password)
 
@@ -75,6 +71,18 @@ class centosProvision(AbstractProvision):
         with open("/etc/sysconfig/iptables", "w") as f:
             f.write("\n".join(conf)) 
         os.system("service iptables restart")
+
+    def install_wordpress(self):
+        super(centosProvision, self).install_wordpress()
+        #set authority
+        os.system("chcon -R -h -t httpd_sys_content_t " + self.http_root + 'wordpress/')
+        os.system("/etc/init.d/httpd restart")
+    
+    def install_phpwind(self):
+        super(centosProvision, self).install_phpwind()
+        #set authority
+        os.system("chcon -R -h -t httpd_sys_content_t " + self.http_root + 'phpwind/')
+        os.system("/etc/init.d/httpd restart")
         
 if __name__ == '__main__':
     a = centosProvision(None)
