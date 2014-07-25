@@ -136,6 +136,9 @@ class SuSEProvision(AbstractProvision):
             f.write('\n'.join(conf))
         os.system("systemctl restart SuSEfirewall2.service")
 
+    def install_javaenv(self):
+        os.system("")
+
 if __name__ == '__main__':
     a = SuSEProvision(None)
     a.install_lamp()
