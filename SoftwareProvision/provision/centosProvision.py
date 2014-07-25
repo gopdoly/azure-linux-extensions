@@ -78,11 +78,11 @@ class centosProvision(AbstractProvision):
             os.mkdir("/azuredata")
         os.system("cd /azuredata && wget http://www.atomicorp.com/installers/atomic")
         with open("/azuredata/atomic") as f:
-            conf = f.read()
-        conf = conf.split('\n')
-        conf = [line.replace('read INPUTTEXT < /dev/tty', 'INPUTTEXT=yes')]
+            content = f.read()
+        content = content.split('\n')
+        content = [line.replace('read INPUTTEXT < /dev/tty', 'INPUTTEXT=yes') for line in content]
         with open("/azuredata/atomic", "w") as f:
-            f.write('\n'.join(conf))
+            f.write('\n'.join(content))
         os.system("sh /azuredata/atomic")
 
         # install lnmp
@@ -95,6 +95,8 @@ class centosProvision(AbstractProvision):
         os.system("/etc/init.d/mysqld start")
 
         os.system("yum -y install php-fpm php-cli phh-cgi php-mcrypt php-mysql")
+        os.system("chkconfig php-fpm on")
+        os.system("service php-fpm start")
 
         # config nginx
         with open("/etc/nginx/conf.d/default.conf") as f:
@@ -103,23 +105,37 @@ class centosProvision(AbstractProvision):
         conf_strip = [s.strip() for s in conf]
         start = conf_strip.index(r"# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000")
         start = conf_strip[start:].index(r"#location ~ \.php$ {") + start
-        end = conf_strip[start:].inedex(r"#}") + start
-        for i in range(start, end + 1)
+        end = conf_strip[start:].index(r"#}") + start
+        for i in range(start, end + 1):
             if '#' in conf[i]:
                 pos = conf[i].index('#')
                 conf[i] = conf[i][:pos] + conf[i][pos+1:]
-        with open("/etc/nginx/conf.d/default.conf") as f:
+            if "fastcgi_param" in conf[i] and "SCRIPT_FILENAME" in conf[i]:
+                conf[i] = "fastcgi_param SCRIPT_FILENAME  $document_root$fastcgi_script_name;"
+        with open("/etc/nginx/conf.d/default.conf", "w") as f:
             f.write('\n'.join(conf))
 
         for line in conf_strip:
             if line.startswith("root"):
-                self.http_root = line.split(' ')[1].strip(';') + '/'
+                self.http_root = line.split(' ')[-1].strip(';') + '/'
                 break
         with open(self.http_root + "info.php", "w") as f:
             f.write("<?php\nphpinfo();\n?>")
 
         os.system("service nginx restart")
 
+        #config iptables
+        with open("/etc/sysconfig/iptables") as f:
+            conf = f.read()
+        conf = conf.split('\n')
+        pos = conf.index("-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT")
+        if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT" in conf:
+            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
+        if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT" in conf:
+            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
+        with open("/etc/sysconfig/iptables", "w") as f:
+            f.write("\n".join(conf)) 
+        os.system("service iptables restart")
 
     def install_wordpress(self):
         super(centosProvision, self).install_wordpress()
@@ -135,5 +151,5 @@ class centosProvision(AbstractProvision):
         
 if __name__ == '__main__':
     a = centosProvision(None)
-    a.install_lamp()
+    a.install_lnmp()
  
