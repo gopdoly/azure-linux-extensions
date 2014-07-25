@@ -72,6 +72,31 @@ class centosProvision(AbstractProvision):
             f.write("\n".join(conf)) 
         os.system("service iptables restart")
 
+    def install_lnmp(self):
+        # install a third-party source
+        if not os.path.isdir("/azuredata"):
+            os.mkdir("/azuredata")
+        os.system("cd /azuredata && wget http://www.atomicorp.com/installers/atomic")
+        with open("/azuredata/atomic") as f:
+            conf = f.read()
+        conf = conf.split('\n')
+        conf = [line.replace('read INPUTTEXT < /dev/tty', 'INPUTTEXT=yes')]
+        with open("/azuredata/atomic", "w") as f:
+            f.write('\n'.join(conf))
+        os.system("sh /azuredata/atomic")
+
+        # install lnmp
+        os.system("yum -y install nginx")
+        os.system("chkconfig nginx on")
+        os.system("service nginx start")
+
+        os.system("yum -y install mysql mysql-server")
+        os.system("chkconfig mysqld on")
+        os.system("/etc/init.d/mysqld start")
+
+        os.system("yum -y install php-fpm php-cli phh-cgi php-mcrypt php-mysql")
+
+
     def install_wordpress(self):
         super(centosProvision, self).install_wordpress()
         #set authority
