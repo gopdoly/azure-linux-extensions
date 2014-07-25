@@ -147,20 +147,35 @@ class centosProvision(AbstractProvision):
     def install_javaenv(self):
         os.system("yum -y install java")
         java_home = "/usr/lib/jvm/jre-1.7.0-openjdk"
-        with open("/root/.bashrc", "a") as f:
+        with open("/etc/profile", "a") as f:
             f.write("\nexport JAVA_HOME=" + java_home + '\n')
-            f.write("export JRE_HOME=${JAVA_HOME}/jre")
+            f.write("export JRE_HOME=${JAVA_HOME}/jre\n")
             f.write("export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib\n")
             f.write("export PATH=${JAVA_HOME}/bin:${JRE_HOME}/bin:$PATH\n")
-        os.system("bash")
+        os.system("source /etc/profile")
 
+        #install tomcat
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
         os.system("mkdir /azuredata")
         os.system("cd /azuredata && wget -c https://chiy.blob.core.windows.net/softwareprovision/apache-tomcat-7.0.55.tar.gz")
-        os.system("cd /azuredata && tar xvzf latest.tar.gz")
+        os.system("cd /azuredata && tar xvzf apache-tomcat-7.0.55.tar.gz")
         os.system("cd /azuredata && mv apache-tomcat-7.0.55 tomcat")
-        os.system("cd /azuredata/tomcat && ./startup.sh")
+        os.system("cd /azuredata/tomcat/bin && ./startup.sh")
+
+        #config iptables
+        with open("/etc/sysconfig/iptables") as f:
+            conf = f.read()
+        conf = conf.split('\n')
+        for i in range(0, len(conf)):
+            if conf[i].startswith(":OUTPUT ACCEPT"):
+                pos = i
+                break
+        if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT" in conf:
+            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT")
+        with open("/etc/sysconfig/iptables", "w") as f:
+            f.write("\n".join(conf))
+        os.system("service iptables restart")
 
     def install_wordpress(self):
         super(centosProvision, self).install_wordpress()
@@ -176,5 +191,5 @@ class centosProvision(AbstractProvision):
  
 if __name__ == '__main__':
     a = centosProvision(None)
-    a.install_lamp()
+    a.install_javaenv()
  
