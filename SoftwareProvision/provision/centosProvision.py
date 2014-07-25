@@ -56,6 +56,10 @@ class centosProvision(AbstractProvision):
         with open(self.http_root + "info.php", "w") as f:
             f.write("<?php\nphpinfo();\n?>")
 
+        #set authority
+        os.system("chcon -R -h -t httpd_sys_content_t /var/www/html/")
+        os.system("/etc/init.d/httpd restart")
+
         #set mysql password
         os.system("mysqladmin -u root password " + self.mysql_password)
 
@@ -68,9 +72,11 @@ class centosProvision(AbstractProvision):
             conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
         if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT" in conf:
             conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
+        with open("/etc/sysconfig/iptables", "w") as f:
+            f.write("\n".join(conf)) 
         os.system("service iptables restart")
         
 if __name__ == '__main__':
     a = centosProvision(None)
     a.install_lamp()
-        
+ 
