@@ -96,6 +96,30 @@ class centosProvision(AbstractProvision):
 
         os.system("yum -y install php-fpm php-cli phh-cgi php-mcrypt php-mysql")
 
+        # config nginx
+        with open("/etc/nginx/conf.d/default.conf") as f:
+            conf = f.read()
+        conf = conf.split('\n')
+        conf_strip = [s.strip() for s in conf]
+        start = conf_strip.index(r"# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000")
+        start = conf_strip[start:].index(r"#location ~ \.php$ {") + start
+        end = conf_strip[start:].inedex(r"#}") + start
+        for i in range(start, end + 1)
+            if '#' in conf[i]:
+                pos = conf[i].index('#')
+                conf[i] = conf[i][:pos] + conf[i][pos+1:]
+        with open("/etc/nginx/conf.d/default.conf") as f:
+            f.write('\n'.join(conf))
+
+        for line in conf_strip:
+            if line.startswith("root"):
+                self.http_root = line.split(' ')[1].strip(';') + '/'
+                break
+        with open(self.http_root + "info.php", "w") as f:
+            f.write("<?php\nphpinfo();\n?>")
+
+        os.system("service nginx restart")
+
 
     def install_wordpress(self):
         super(centosProvision, self).install_wordpress()
