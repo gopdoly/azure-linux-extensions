@@ -35,11 +35,9 @@ from AbstractProvision import AbstractProvision
 
 class UbuntuProvision(AbstractProvision):
     def __init__(self, hutil):
+        super(UbuntuProvision, self).__init__(hutil)
         os.system("apt-get update")
         os.system("apt-get install unzip")
-        self.mysql_user = "root"
-        self.mysql_password = "root"
-        self.http_root = "/var/www/"
 
     def install_lamp(self):
         os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install lamp-server^")
@@ -82,5 +80,6 @@ class UbuntuProvision(AbstractProvision):
 if __name__ == '__main__':
     a = UbuntuProvision(None)
 #    a.install_lamp()
+#    a.install_lnmp()
 #    a.install_wordpress()
 #    a.install_phpwind()

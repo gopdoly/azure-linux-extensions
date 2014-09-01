@@ -35,6 +35,21 @@ from Utils.WAAgentUtil import waagent
 import Utils.HandlerUtil as Util
 
 class AbstractProvision(object):
+    def __init__(self, hutil):
+        self.mysql_user = "root"
+        self.mysql_password = "root"
+        self.http_root = "/var/www/"
+
+    def install(self, software_list):
+        if 'lamp' in software_list:
+            self.install_lamp()
+        if 'javaenv' in software_list:
+            self.install_javaenv()
+        if 'wordpress' in software_list:
+            self.install_wordpress()
+        if 'phpwind' in software_list:
+            self.install_phpwind()
+
     def install_wordpress(self):
         # ensure have already installed lamp
         if not os.path.isdir("/azuredata"):
