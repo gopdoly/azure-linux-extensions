@@ -41,15 +41,16 @@ class UbuntuProvision(AbstractProvision):
 
     def install_lamp(self):
         os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install lamp-server^")
-        with open(self.http_root + "info.php", "w") as f:
-            f.write("<?php\nphpinfo();\n?>")
+
         with open('/etc/apache2/sites-available/' + os.listdir('/etc/apache2/sites-available')[0]) as f:
             conf = f.read()
         for line in conf.split('\n'):
             if line.strip().startswith('DocumentRoot '):
                 self.http_root = line.split(' ')[1] + '/'
                 break
-                
+
+        with open(self.http_root + "info.php", "w") as f:
+            f.write("<?php\nphpinfo();\n?>")
         os.system("mysqladmin -u root password " + self.mysql_password)
 
     def install_lnmp(self):
