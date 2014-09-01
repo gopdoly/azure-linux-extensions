@@ -20,6 +20,8 @@ import os
 import re
 import platform
 
+from UbuntuProvision import UbuntuProvision
+
 # Define the function in case waagent(<2.0.4) doesn't have DistInfo()
 def DistInfo(fullname=0):
     if 'FreeBSD' in platform.system():
@@ -39,12 +41,12 @@ def DistInfo(fullname=0):
     else:
         return platform.dist()
 
-def GetMyProvision(hutil, patching_class_name=''):
+def GetMyProvision(hutil, provision_class_name=''):
     """
     Return MyProvision object.
     NOTE: Logging is not initialized at this point.
     """
-    if patching_class_name == '':
+    if provision_class_name == '':
         if 'Linux' in platform.system():
             Distro = DistInfo()[0]
         else:
@@ -52,10 +54,10 @@ def GetMyProvision(hutil, patching_class_name=''):
                 Distro = platform.system()
         Distro = Distro.strip('"')
         Distro = Distro.strip(' ')
-        patching_class_name = Distro + 'Provision'
+        provision_class_name = Distro + 'Provision'
     else:
-        Distro = patching_class_name
-    if not globals().has_key(patching_class_name):
+        Distro = provision_class_name
+    if not globals().has_key(provision_class_name):
         print Distro+' is not a supported distribution.'
         return None
-    return globals()[patching_class_name](hutil)
+    return globals()[provision_class_name](hutil)

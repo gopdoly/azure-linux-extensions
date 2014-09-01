@@ -38,7 +38,7 @@ def install():
     try:
         # Ensure the same configuration is executed only once
         hutil.exit_if_seq_smaller()
-        myProvisioning.install()
+        myProvision.install()
         hutil.do_exit(0, 'Install', 'success', '0', 'Install Succeeded')
     except Exception, e:
         hutil.error("Failed to install the extension with error: %s, \
