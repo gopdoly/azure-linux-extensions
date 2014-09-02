@@ -33,4 +33,21 @@ from Utils.WAAgentUtil import waagent
 import Utils.HandlerUtil as Util
 
 class centosProvision(AbstractProvision):
+    def install_lamp(self):
+        os.system("yum -y install httpd")
+        os.system("chkconfig httpd on")
+        os.system("/etc/init.d/httpd start")
+
+        os.system("yum -y install mysql mysql-server")
+        os.system("chkconfig mysqld on")
+        os.system("/etc/init.d/mysqld start")
+
+        os.system("yum -y install php php-mysql")
+        os.system("/etc/init.d/httpd restart")
+        with open("/var/www/html/info.php", "w") as f:
+            f.write("<?php\nphpinfo();\n?>")
+        
+if __name__ == '__main__':
+    a = centosConfigure()
+    a.install_lamp()
         

@@ -43,6 +43,8 @@ class AbstractProvision(object):
     def install(self, software_list):
         if 'lamp' in software_list:
             self.install_lamp()
+        if 'lnmp' in software_list:
+            self.install_lnmp()
         if 'javaenv' in software_list:
             self.install_javaenv()
         if 'wordpress' in software_list:
