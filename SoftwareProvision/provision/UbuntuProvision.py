@@ -36,8 +36,8 @@ from AbstractProvision import AbstractProvision
 class UbuntuProvision(AbstractProvision):
     def __init__(self, hutil):
         super(UbuntuProvision, self).__init__(hutil)
-        os.system("apt-get update")
-        os.system("apt-get install unzip")
+        #os.system("apt-get update")
+        #os.system("apt-get install unzip")
 
     def install_lamp(self):
         os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install lamp-server^")
@@ -60,9 +60,35 @@ class UbuntuProvision(AbstractProvision):
         os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install mysql-server mysql-client")
         os.system("mysqladmin -u root password " + self.mysql_password)
 
-        os.system("apt-get -y install php5-cli php5-cgi php5-fpm php5-mcrypt php5-mysql")
-        os.system("/etc/init.d/nginx restart")
+        os.system("apt-get -y install php5-fpm")
+        os.system("apt-get -y install php5-cli php5-cgi php5-mcrypt php5-mysql")
+        self.config_lnmp()
+       
+    def config_lnmp(self):
+        with open("/etc/nginx/sites-available/default") as f:
+            conf = f.read()
+        conf = conf.split('\n')
+        conf_strip = [s.strip() for s in conf]
+        start = conf_strip.index(r"#location ~ \.php$ {")
+        end = conf_strip[start:].index("#}") + start
+        for i in range(start, end + 1):
+            if '#' in conf[i]:
+                pos = conf[i].index('#')
+                conf[i] = conf[i][:pos] + conf[i][pos+1:]
+            if conf[i].strip().startswith("fastcgi_pass 127.0.0.1"):
+                conf[i] = '#' + conf[i] 
+        with open("/etc/nginx/sites-available/default", "w") as f:
+            f.write('\n'.join(conf))
 
+        for line in conf_strip:
+            if line.startswith("root"):
+                self.http_root = line.split(' ')[1].strip(';') + '/'
+                break
+        with open(self.http_root + "info.php", "w") as f:
+            f.write("<?php\nphpinfo();\n?>")
+
+        os.system("/etc/init.d/nginx restart")
+ 
     def install_javaenv(self):
         os.system("apt-get -y install openjdk-7-jdk")
         java_home = "/usr/lib/jvm/java-7-openjdk"
@@ -80,7 +106,8 @@ class UbuntuProvision(AbstractProvision):
 
 if __name__ == '__main__':
     a = UbuntuProvision(None)
+#    a.config_lnmp()
 #    a.install_lamp()
-#    a.install_lnmp()
+    a.install_lnmp()
 #    a.install_wordpress()
 #    a.install_phpwind()
