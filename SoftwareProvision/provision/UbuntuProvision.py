@@ -36,8 +36,8 @@ from AbstractProvision import AbstractProvision
 class UbuntuProvision(AbstractProvision):
     def __init__(self, hutil):
         super(UbuntuProvision, self).__init__(hutil)
-        #os.system("apt-get update")
-        #os.system("apt-get install unzip")
+        os.system("apt-get update")
+        os.system("apt-get install unzip")
 
     def install_lamp(self):
         os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install lamp-server^")
