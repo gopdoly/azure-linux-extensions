@@ -63,11 +63,11 @@ class centosProvision(AbstractProvision):
         with open("/etc/sysconfig/iptables") as f:
             conf = f.read()
         conf = conf.split('\n')
-        pos = conf.index("-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT")
+        pos = conf.index("COMMIT")
         if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT" in conf:
-            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
+            conf.insert(pos, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
         if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT" in conf:
-            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
+            conf.insert(pos, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
         with open("/etc/sysconfig/iptables", "w") as f:
             f.write("\n".join(conf)) 
         os.system("service iptables restart")
@@ -128,11 +128,11 @@ class centosProvision(AbstractProvision):
         with open("/etc/sysconfig/iptables") as f:
             conf = f.read()
         conf = conf.split('\n')
-        pos = conf.index("-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT")
+        pos = conf.index("COMMIT")
         if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT" in conf:
-            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
+            conf.insert(pos, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
         if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT" in conf:
-            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
+            conf.insert(pos, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
         with open("/etc/sysconfig/iptables", "w") as f:
             f.write("\n".join(conf)) 
         os.system("service iptables restart")

@@ -40,6 +40,7 @@ class UbuntuProvision(AbstractProvision):
         os.system("apt-get install unzip")
 
     def install_lamp(self):
+        os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install mysql-server mysql-client")
         os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install lamp-server^")
 
         with open('/etc/apache2/sites-available/' + os.listdir('/etc/apache2/sites-available')[0]) as f:
@@ -107,7 +108,7 @@ class UbuntuProvision(AbstractProvision):
 if __name__ == '__main__':
     a = UbuntuProvision(None)
 #    a.config_lnmp()
-#    a.install_lamp()
-    a.install_lnmp()
-#    a.install_wordpress()
-#    a.install_phpwind()
+    a.install_lamp()
+#    a.install_lnmp()
+    a.install_wordpress()
+    a.install_phpwind()
