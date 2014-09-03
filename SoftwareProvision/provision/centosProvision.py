@@ -43,7 +43,7 @@ class centosProvision(AbstractProvision):
         os.system("chkconfig mysqld on")
         os.system("/etc/init.d/mysqld start")
 
-        os.system("yum -y install php php-mysql")
+        os.system("yum -y install php php-mysql php-xml")
         os.system("/etc/init.d/httpd restart")
 
         #get http root
