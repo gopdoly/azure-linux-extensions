@@ -33,7 +33,7 @@ from Utils.WAAgentUtil import waagent
 import Utils.HandlerUtil as Util
 from AbstractProvision import AbstractProvision
 
-class SuSEProvision(object):
+class SuSEProvision(AbstractProvision):
     def install_lamp(self):
         os.system("zypper -n in apache2")
         os.system("systemctl start apache2.service")
@@ -42,7 +42,7 @@ class SuSEProvision(object):
         
         os.system("zypper -n in mysql mysql-client")
         os.system("chkconfig mysql on")
-		os.system("service mysql start")
+        os.system("service mysql start")
         
         os.system("zypper -n in php5 php5-mysql apache2-mod_php5")
         os.system("a2enmod php5")
@@ -52,7 +52,7 @@ class SuSEProvision(object):
             f.write("<html><body><h1>It works!</h1></body></html>")
         with open("/srv/www/htdocs/info.php", "w") as f:
             f.write("<?php\nphpinfo();\n?>")
-            	
+                
 if __name__ == '__main__':
-    a = SuSEProvision()
+    a = SuSEProvision(None)
     a.install_lamp()
