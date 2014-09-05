@@ -48,11 +48,22 @@ class SuSEProvision(AbstractProvision):
         os.system("a2enmod php5")
         os.system("service apache2 restart")
 
-        with open("/srv/www/htdocs/index.html", "w") as f:
-            f.write("<html><body><h1>It works!</h1></body></html>")
-        with open("/srv/www/htdocs/info.php", "w") as f:
+        # get http root
+        with open("/etc/apache2/default-server.conf") as f:
+            conf = f.read()
+        for line in conf.split('\n'):
+            if line.strip().startswith('DocumentRoot '):
+                self.http_root = line.split(' ')[1].strip('"') + '/'
+                break
+
+        with open(self.http_root + "info.php", "w") as f:
             f.write("<?php\nphpinfo();\n?>")
+        with open(self.http_root + "index.html", "w") as f:
+            f.write("<html><body><h1>It works!</h1></body></html>")
                 
+    def install_lnmp(self):
+        pass
+
 if __name__ == '__main__':
     a = SuSEProvision(None)
     a.install_lamp()
