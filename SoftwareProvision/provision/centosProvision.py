@@ -43,7 +43,8 @@ class centosProvision(AbstractProvision):
         os.system("chkconfig mysqld on")
         os.system("/etc/init.d/mysqld start")
 
-        os.system("yum -y install php php-mysql php-xml")
+        os.system("yum -y install php php-mysql")
+        os.system("yum -y install php-gd php-xml php-mbstring php-ldap php-pear php-xmlrpc")
         os.system("/etc/init.d/httpd restart")
 
         #get http root
@@ -63,7 +64,10 @@ class centosProvision(AbstractProvision):
         with open("/etc/sysconfig/iptables") as f:
             conf = f.read()
         conf = conf.split('\n')
-        pos = conf.index("COMMIT")
+        for i in range(0, len(conf)):
+            if conf[i].startswith(":OUTPUT ACCEPT"):
+                pos = i
+                break
         if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT" in conf:
             conf.insert(pos, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
         if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT" in conf:
@@ -128,28 +132,31 @@ class centosProvision(AbstractProvision):
         with open("/etc/sysconfig/iptables") as f:
             conf = f.read()
         conf = conf.split('\n')
-        pos = conf.index("COMMIT")
+        for i in range(0, len(conf)):
+            if conf[i].startswith(":OUTPUT ACCEPT"):
+                pos = i
+                break
         if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT" in conf:
-            conf.insert(pos, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
+            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
         if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT" in conf:
-            conf.insert(pos, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
+            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
         with open("/etc/sysconfig/iptables", "w") as f:
-            f.write("\n".join(conf)) 
+            f.write("\n".join(conf))
         os.system("service iptables restart")
 
     def install_wordpress(self):
         super(centosProvision, self).install_wordpress()
-        #set authority
+        # set authority
         os.system("chcon -R -h -t httpd_sys_content_t " + self.http_root + 'wordpress/')
         os.system("/etc/init.d/httpd restart")
     
     def install_phpwind(self):
         super(centosProvision, self).install_phpwind()
-        #set authority
+        # set authority
         os.system("chcon -R -h -t httpd_sys_content_t " + self.http_root + 'phpwind/')
         os.system("/etc/init.d/httpd restart")
-        
+ 
 if __name__ == '__main__':
     a = centosProvision(None)
-    a.install_lnmp()
+    a.install_lamp()
  

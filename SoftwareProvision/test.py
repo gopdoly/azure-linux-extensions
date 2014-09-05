@@ -33,7 +33,7 @@ from provision import *
 # Global variables definition
 ExtensionShortName = 'SoftwareProvision'
 
-test_settings = ['lnmp']
+test_settings = {"lnmp": ""}
 
 def install():
     hutil.do_parse_context('Install')
@@ -44,8 +44,7 @@ def enable():
     try:
         # Ensure the same configuration is executed only once
         hutil.exit_if_seq_smaller()
-        protect_settings = hutil._context._config['runtimeSettings'][0]\
-                           ['handlerSettings'].get('protectedSettings')
+        protect_settings = test_settings
         myProvision.install(protect_settings)
         hutil.do_exit(0, 'Enable', 'success', '0', 'Enable Succeeded')
     except Exception, e:
