@@ -109,6 +109,5 @@ if __name__ == '__main__':
     a = UbuntuProvision(None)
 #    a.config_lnmp()
     a.install_lamp()
-#    a.install_lnmp()
     a.install_wordpress()
     a.install_phpwind()

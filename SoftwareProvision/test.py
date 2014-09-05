@@ -37,22 +37,21 @@ test_settings = ['lnmp']
 
 def install():
     hutil.do_parse_context('Install')
+    hutil.do_exit(0, 'Install', 'success', '0', 'Install Succeeded')
+    
+def enable():
+    hutil.do_parse_context('Enable')
     try:
         # Ensure the same configuration is executed only once
         hutil.exit_if_seq_smaller()
         protect_settings = hutil._context._config['runtimeSettings'][0]\
                            ['handlerSettings'].get('protectedSettings')
-        protect_settings = test_settings
         myProvision.install(protect_settings)
-        hutil.do_exit(0, 'Install', 'success', '0', 'Install Succeeded')
+        hutil.do_exit(0, 'Enable', 'success', '0', 'Enable Succeeded')
     except Exception, e:
         hutil.error("Failed to install the extension with error: %s, \
                      stack trace: %s" %(str(e), traceback.format_exc()))
-        hutil.do_exit(1, 'Install', 'error', '0', 'Install Failed')
-
-def enable():
-    hutil.do_parse_context('Enable')
-    hutil.do_exit(0, 'Enable', 'success', '0', 'Enable Failed.')
+        hutil.do_exit(1, 'Enable', 'error', '0', 'Enable Failed')
 
 def uninstall():
     hutil.do_parse_context('Uninstall')
