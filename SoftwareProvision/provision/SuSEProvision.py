@@ -60,6 +60,15 @@ class SuSEProvision(AbstractProvision):
             f.write("<?php\nphpinfo();\n?>")
         with open(self.http_root + "index.html", "w") as f:
             f.write("<html><body><h1>It works!</h1></body></html>")
+
+        # config firewall
+        with open("/etc/sysconfig/SuSEfirewall2.service") as f:
+            conf = f.read()
+        conf = conf.split('\n')
+        for i in range(0, len(conf)):
+            if conf[i].startswith("FW_CONFIGURATIONS_EXT"):
+                conf[i] = conf[i][:len(conf[i])-1] + ' apache2"'
+                break
                 
     def install_lnmp(self):
         pass
