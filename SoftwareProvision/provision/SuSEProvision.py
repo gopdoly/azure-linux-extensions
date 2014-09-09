@@ -61,6 +61,9 @@ class SuSEProvision(AbstractProvision):
         with open(self.http_root + "index.html", "w") as f:
             f.write("<html><body><h1>It works!</h1></body></html>")
 
+        #set mysql password
+        os.system("mysqladmin -u root password " + self.mysql_password)
+
         # config firewall
         with open("/etc/sysconfig/SuSEfirewall2") as f:
             conf = f.read()
