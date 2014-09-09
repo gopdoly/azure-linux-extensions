@@ -40,7 +40,7 @@ class SuSEProvision(AbstractProvision):
         os.system("systemctl enable apache2.service")
         os.system("chkconfig apache2 on")
         
-        os.system("zypper -n in mysql mysql-client")
+        os.system("zypper -n in mariadb mariadb-tools")
         os.system("chkconfig mysql on")
         os.system("service mysql start")
         
@@ -69,6 +69,8 @@ class SuSEProvision(AbstractProvision):
             if conf[i].startswith("FW_SERVICES_EXT_TCP"):
                 conf[i] = conf[i][:-1] + ' 80"'
                 break
+        with open("/etc/sysconfig/SuSEfirewall2", "w") as f:
+            f.write('\n'.join(conf))
         os.system("systemctl restart SuSEfirewall2.service")
  
     def install_lnmp(self):
@@ -77,7 +79,7 @@ class SuSEProvision(AbstractProvision):
         os.system("systemctl enable nginx.service")
         os.system("chkconfig nginx on")
         
-        os.system("zypper -n in mysql mysql-client")
+        os.system("zypper -n in mariadb mariadb-tools")
         os.system("chkconfig mysql on")
         os.system("service mysql start")
         
@@ -90,11 +92,10 @@ class SuSEProvision(AbstractProvision):
         with open("/etc/php5/fpm/php-fpm.conf", "w") as f:
             f.write('\n'.join(conf))
         os.system("php-fpm")
-        os.system("systemctl enable php-fpm.service")
         os.system("systemctl start php-fpm.service")
 
         # config nginx
-        with open("/etc/nginx/conf.d/default.conf") as f:
+        with open("/etc/nginx/nginx.conf") as f:
             conf = f.read()
         conf = conf.split('\n')
         conf_strip = [s.strip() for s in conf]
@@ -107,18 +108,18 @@ class SuSEProvision(AbstractProvision):
                 conf[i] = conf[i][:pos] + conf[i][pos+1:]
             if "fastcgi_param" in conf[i] and "SCRIPT_FILENAME" in conf[i]:
                 conf[i] = "fastcgi_param SCRIPT_FILENAME  /srv/www/htdocs/$fastcgi_script_name;"
-        with open("/etc/nginx/conf.d/default.conf", "w") as f:
+        with open("/etc/nginx/nginx.conf", "w") as f:
             f.write('\n'.join(conf))
 
         for line in conf_strip:
             if line.startswith("root"):
                 self.http_root = line.split(' ')[-1].strip(';') + '/'
                 break
+        with open(self.http_root + "index.html", "w") as f:
+            f.write("<html><body><h1>It works!</h1></body></html>")
+
         with open(self.http_root + "info.php", "w") as f:
             f.write("<?php\nphpinfo();\n?>")
-
-        os.system("service nginx restart")
-
 
         # config firewall
         with open("/etc/sysconfig/SuSEfirewall2") as f:
@@ -128,8 +129,10 @@ class SuSEProvision(AbstractProvision):
             if conf[i].startswith("FW_SERVICES_EXT_TCP"):
                 conf[i] = conf[i][:-1] + ' 80"'
                 break
+        with open("/etc/sysconfig/SuSEfirewall2", "w") as f:
+            f.write('\n'.join(conf))
         os.system("systemctl restart SuSEfirewall2.service")
 
 if __name__ == '__main__':
     a = SuSEProvision(None)
-    a.install_lamp()
+    a.install_lnmp()
