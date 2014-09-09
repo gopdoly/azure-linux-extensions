@@ -62,16 +62,45 @@ class SuSEProvision(AbstractProvision):
             f.write("<html><body><h1>It works!</h1></body></html>")
 
         # config firewall
-        with open("/etc/sysconfig/SuSEfirewall2.service") as f:
+        with open("/etc/sysconfig/SuSEfirewall2") as f:
             conf = f.read()
         conf = conf.split('\n')
         for i in range(0, len(conf)):
-            if conf[i].startswith("FW_CONFIGURATIONS_EXT"):
-                conf[i] = conf[i][:len(conf[i])-1] + ' apache2"'
+            if conf[i].startswith("FW_SERVICES_EXT_TCP"):
+                conf[i] = conf[i][:-1] + ' 80"'
                 break
-                
+        os.system("systemctl restart SuSEfirewall2.service")
+ 
     def install_lnmp(self):
-        pass
+        os.system("zypper -n in nginx")
+        os.system("systemctl start nginx.service")
+        os.system("systemctl enable nginx.service")
+        os.system("chkconfig nginx on")
+        
+        os.system("zypper -n in mysql mysql-client")
+        os.system("chkconfig mysql on")
+        os.system("service mysql start")
+        
+        os.system("zypper -n in php5-fpm")
+        os.system("cp /etc/php5/fpm/php-fpm.conf.default /etc/php5/fpm/php-fpm.conf")
+        with open("/etc/php5/fpm/php-fpm.conf") as f:
+            conf = f.read()
+        conf = conf.split('\n')
+        conf[conf.index(";error_log = log/php-fpm.log")] = "error_log = /var/log/php-fpm.log"
+        with open("/etc/php5/fpm/php-fpm.conf", "w") as f:
+            f.write('\n'.join(conf))
+        os.system("systemctl enable php-fpm.service")
+        os.system("systemctl start php-fpm.service")
+
+        # config firewall
+        with open("/etc/sysconfig/SuSEfirewall2") as f:
+            conf = f.read()
+        conf = conf.split('\n')
+        for i in range(0, len(conf)):
+            if conf[i].startswith("FW_SERVICES_EXT_TCP"):
+                conf[i] = conf[i][:-1] + ' 80"'
+                break
+        os.system("systemctl restart SuSEfirewall2.service")
 
 if __name__ == '__main__':
     a = SuSEProvision(None)
