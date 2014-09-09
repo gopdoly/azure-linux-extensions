@@ -110,6 +110,7 @@ class SuSEProvision(AbstractProvision):
                 conf[i] = "fastcgi_param SCRIPT_FILENAME  /srv/www/htdocs/$fastcgi_script_name;"
         with open("/etc/nginx/nginx.conf", "w") as f:
             f.write('\n'.join(conf))
+        os.system("systemctl restart nginx.service")
 
         for line in conf_strip:
             if line.startswith("root"):
@@ -117,7 +118,6 @@ class SuSEProvision(AbstractProvision):
                 break
         with open(self.http_root + "index.html", "w") as f:
             f.write("<html><body><h1>It works!</h1></body></html>")
-
         with open(self.http_root + "info.php", "w") as f:
             f.write("<?php\nphpinfo();\n?>")
 
