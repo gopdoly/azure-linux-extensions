@@ -83,7 +83,7 @@ class SuSEProvision(AbstractProvision):
         os.system("chkconfig mysql on")
         os.system("service mysql start")
         
-        os.system("zypper -n in php5-fpm")
+        os.system("zypper -n in php5-fpm php5-mysql")
         os.system("cp /etc/php5/fpm/php-fpm.conf.default /etc/php5/fpm/php-fpm.conf")
         with open("/etc/php5/fpm/php-fpm.conf") as f:
             conf = f.read()
@@ -135,4 +135,6 @@ class SuSEProvision(AbstractProvision):
 
 if __name__ == '__main__':
     a = SuSEProvision(None)
-    a.install_lnmp()
+    a.install_lamp()
+    a.install_wordpress()
+    a.install_phpwind()
