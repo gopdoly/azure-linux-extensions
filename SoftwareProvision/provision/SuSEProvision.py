@@ -89,8 +89,36 @@ class SuSEProvision(AbstractProvision):
         conf[conf.index(";error_log = log/php-fpm.log")] = "error_log = /var/log/php-fpm.log"
         with open("/etc/php5/fpm/php-fpm.conf", "w") as f:
             f.write('\n'.join(conf))
+        os.system("php-fpm")
         os.system("systemctl enable php-fpm.service")
         os.system("systemctl start php-fpm.service")
+
+        # config nginx
+        with open("/etc/nginx/conf.d/default.conf") as f:
+            conf = f.read()
+        conf = conf.split('\n')
+        conf_strip = [s.strip() for s in conf]
+        start = conf_strip.index(r"# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000")
+        start = conf_strip[start:].index(r"#location ~ \.php$ {") + start
+        end = conf_strip[start:].index(r"#}") + start
+        for i in range(start, end + 1):
+            if '#' in conf[i]:
+                pos = conf[i].index('#')
+                conf[i] = conf[i][:pos] + conf[i][pos+1:]
+            if "fastcgi_param" in conf[i] and "SCRIPT_FILENAME" in conf[i]:
+                conf[i] = "fastcgi_param SCRIPT_FILENAME  /srv/www/htdocs/$fastcgi_script_name;"
+        with open("/etc/nginx/conf.d/default.conf", "w") as f:
+            f.write('\n'.join(conf))
+
+        for line in conf_strip:
+            if line.startswith("root"):
+                self.http_root = line.split(' ')[-1].strip(';') + '/'
+                break
+        with open(self.http_root + "info.php", "w") as f:
+            f.write("<?php\nphpinfo();\n?>")
+
+        os.system("service nginx restart")
+
 
         # config firewall
         with open("/etc/sysconfig/SuSEfirewall2") as f:
