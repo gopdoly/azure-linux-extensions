@@ -81,7 +81,7 @@ class SuSEProvision(AbstractProvision):
         os.system("systemctl start nginx.service")
         os.system("systemctl enable nginx.service")
         os.system("chkconfig nginx on")
-        
+
         os.system("zypper -n in mariadb mariadb-tools")
         os.system("chkconfig mysql on")
         os.system("service mysql start")
@@ -137,6 +137,7 @@ class SuSEProvision(AbstractProvision):
         os.system("systemctl restart SuSEfirewall2.service")
 
     def install_javaenv(self):
+        os.system("zypper -n in java-1_7_0-openjdk")
         os.system("")
 
 if __name__ == '__main__':
