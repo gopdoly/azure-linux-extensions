@@ -42,9 +42,8 @@ def enable():
     try:
         # Ensure the same configuration is executed only once
         hutil.exit_if_seq_smaller()
-        protect_settings = hutil._context._config['runtimeSettings'][0]\
-                           ['handlerSettings'].get('protectedSettings')
-        myProvision.install(protect_settings)
+        script_path = os.path.realpath(sys.argv[0])
+        os.system('python ' + script_path + ' provision > /var/lib/waagent/install.log &')
         hutil.do_exit(0, 'Enable', 'success', '0', 'Enable Succeeded')
     except Exception, e:
         hutil.error("Failed to install the extension with error: %s, \
@@ -62,6 +61,13 @@ def disable():
 def update():
     hutil.do_parse_context('Upadate')
     hutil.do_exit(0, 'Update', 'success', '0', 'Update Succeeded')
+
+def provision():
+    hutil.do_parse_context('provision')
+    protect_settings = hutil._context._config['runtimeSettings'][0]\
+                           ['handlerSettings'].get('protectedSettings')
+    myProvision.install(protect_settings)
+    
 
 # Main function is the only entrance to this extension handler
 def main():
@@ -87,6 +93,8 @@ def main():
             enable()
         elif re.match("^([-/]*)(update)", a):
             update()
+        elif re.match("^([-/]*)(provision)", a):
+            provision()
 
 if __name__ == '__main__':
     main()

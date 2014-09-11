@@ -38,20 +38,22 @@ test_settings = {"lnmp": "", "wordpress": "", "phpwind": ""}
 def install():
     hutil.do_parse_context('Install')
     hutil.do_exit(0, 'Install', 'success', '0', 'Install Succeeded')
-    
+
 def enable():
     hutil.do_parse_context('Enable')
     try:
         # Ensure the same configuration is executed only once
         hutil.exit_if_seq_smaller()
-        protect_settings = test_settings
-        myProvision.install(protect_settings)
+        protect_settings = hutil._context._config['runtimeSettings'][0]\
+                            ['handlerSettings'].get('protectedSettings')
+        script_path = os.path.realpath(sys.argv[0])
+        os.system('python ' + script_path + ' provision > /var/lib/waagent/install.log &')
         hutil.do_exit(0, 'Enable', 'success', '0', 'Enable Succeeded')
     except Exception, e:
         hutil.error("Failed to install the extension with error: %s, \
                      stack trace: %s" %(str(e), traceback.format_exc()))
         hutil.do_exit(1, 'Enable', 'error', '0', 'Enable Failed')
-
+   
 def uninstall():
     hutil.do_parse_context('Uninstall')
     hutil.do_exit(0, 'Uninstall', 'success', '0', 'Uninstall Succeeded')
@@ -64,6 +66,13 @@ def update():
     hutil.do_parse_context('Upadate')
     hutil.do_exit(0, 'Update', 'success', '0', 'Update Succeeded')
 
+def provision():
+    hutil.do_parse_context('provision')
+    protect_settings = hutil._context._config['runtimeSettings'][0]\
+                           ['handlerSettings'].get('protectedSettings')
+    protect_settings = test_settings
+    myProvision.install(protect_settings)
+ 
 # Main function is the only entrance to this extension handler
 def main():
     waagent.LoggerInit('/var/log/waagent.log', '/dev/stdout')
@@ -77,6 +86,9 @@ def main():
     if myProvision == None:
         sys.exit(1)
 
+    if os.path.isfile("mrseq"):
+        os.remove("mrseq")
+
     for a in sys.argv[1:]:
         if re.match("^([-/]*)(disable)", a):
             disable()
@@ -88,6 +100,9 @@ def main():
             enable()
         elif re.match("^([-/]*)(update)", a):
             update()
+        elif re.match("^([-/]*)(provision)", a):
+            provision()
+
 
 if __name__ == '__main__':
     main()
