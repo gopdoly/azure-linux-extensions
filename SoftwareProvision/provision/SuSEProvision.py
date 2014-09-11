@@ -153,7 +153,12 @@ class SuSEProvision(AbstractProvision):
         os.system("cd /azuredata && tar xvzf apache-tomcat-7.0.55.tar.gz")
         os.system("cd /azuredata && mv apache-tomcat-7.0.55 tomcat")
         os.system("cd /azuredata/tomcat/bin && ./startup.sh")
-        
+
+        # isntall mysql
+        os.system("zypper -n in mariadb mariadb-tools")
+        os.system("chkconfig mysql on")
+        os.system("service mysql start")
+ 
         # config firewall
         with open("/etc/sysconfig/SuSEfirewall2") as f:
             conf = f.read()
