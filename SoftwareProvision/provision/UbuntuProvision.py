@@ -105,6 +105,9 @@ class UbuntuProvision(AbstractProvision):
 
         os.system("apt-get -y install tomcat7")
 
+        os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install mysql-server mysql-client")
+        os.system("mysqladmin -u root password " + self.mysql_password)
+
 if __name__ == '__main__':
     a = UbuntuProvision(None)
 #    a.config_lnmp()

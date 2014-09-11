@@ -162,6 +162,11 @@ class centosProvision(AbstractProvision):
         os.system("cd /azuredata && mv apache-tomcat-7.0.55 tomcat")
         os.system("cd /azuredata/tomcat/bin && ./startup.sh")
 
+        #isntall mysql
+        os.system("yum -y install mysql mysql-server")
+        os.system("chkconfig mysqld on")
+        os.system("/etc/init.d/mysqld start")
+        
         #config iptables
         with open("/etc/sysconfig/iptables") as f:
             conf = f.read()
