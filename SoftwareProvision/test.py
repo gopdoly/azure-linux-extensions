@@ -33,7 +33,7 @@ from provision import *
 # Global variables definition
 ExtensionShortName = 'SoftwareProvision'
 
-test_settings = {"javaenv": ""}
+test_settings = {"lnmp": "", "wordpress": "", "phpwind": ""}
 
 def install():
     hutil.do_parse_context('Install')
