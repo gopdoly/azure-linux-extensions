@@ -138,10 +138,34 @@ class SuSEProvision(AbstractProvision):
 
     def install_javaenv(self):
         os.system("zypper -n in java-1_7_0-openjdk")
-        os.system("")
+        retcode, java_home = waagent.RunGetOutput("find /usr -name java-1.7.0-openjdk | grep /jvm/")
+        with open("/etc/profile", "a") as f:
+            f.write("\nexport JAVA_HOME=" + java_home + '\n')
+            f.write("export JRE_HOME=${JAVA_HOME}/jre\n")
+            f.write("export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib\n")
+            f.write("export PATH=${JAVA_HOME}/bin:${JRE_HOME}/bin:$PATH\n")
+        os.system("source /etc/profile")
 
+        #install tomcat
+        if not os.path.isdir("/azuredata"):
+            os.mkdir("/azuredata")
+        os.system("cd /azuredata && wget -c https://chiy.blob.core.windows.net/softwareprovision/apache-tomcat-7.0.55.tar.gz")
+        os.system("cd /azuredata && tar xvzf apache-tomcat-7.0.55.tar.gz")
+        os.system("cd /azuredata && mv apache-tomcat-7.0.55 tomcat")
+        os.system("cd /azuredata/tomcat/bin && ./startup.sh")
+        
+        # config firewall
+        with open("/etc/sysconfig/SuSEfirewall2") as f:
+            conf = f.read()
+        conf = conf.split('\n')
+        for i in range(0, len(conf)):
+            if conf[i].startswith("FW_SERVICES_EXT_TCP"):
+                conf[i] = conf[i][:-1] + ' 8080"'
+                break
+        with open("/etc/sysconfig/SuSEfirewall2", "w") as f:
+            f.write('\n'.join(conf))
+        os.system("systemctl restart SuSEfirewall2.service")
+ 
 if __name__ == '__main__':
     a = SuSEProvision(None)
-    a.install_lamp()
-    a.install_wordpress()
-    a.install_phpwind()
+    a.install_javaenv()

@@ -157,7 +157,6 @@ class centosProvision(AbstractProvision):
         #install tomcat
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
-        os.system("mkdir /azuredata")
         os.system("cd /azuredata && wget -c https://chiy.blob.core.windows.net/softwareprovision/apache-tomcat-7.0.55.tar.gz")
         os.system("cd /azuredata && tar xvzf apache-tomcat-7.0.55.tar.gz")
         os.system("cd /azuredata && mv apache-tomcat-7.0.55 tomcat")
