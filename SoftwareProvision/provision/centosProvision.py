@@ -166,7 +166,8 @@ class centosProvision(AbstractProvision):
         os.system("yum -y install mysql mysql-server")
         os.system("chkconfig mysqld on")
         os.system("/etc/init.d/mysqld start")
-        
+        os.system("mysqladmin -u root password " + self.mysql_password)
+       
         #config iptables
         with open("/etc/sysconfig/iptables") as f:
             conf = f.read()

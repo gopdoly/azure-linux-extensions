@@ -158,6 +158,7 @@ class SuSEProvision(AbstractProvision):
         os.system("zypper -n in mariadb mariadb-tools")
         os.system("chkconfig mysql on")
         os.system("service mysql start")
+        os.system("mysqladmin -u root password " + self.mysql_password)
  
         # config firewall
         with open("/etc/sysconfig/SuSEfirewall2") as f:
