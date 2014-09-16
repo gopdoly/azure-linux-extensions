@@ -34,8 +34,8 @@ import Utils.HandlerUtil as Util
 from AbstractProvision import AbstractProvision
 
 class SuSEProvision(AbstractProvision):
-    def __init__(self):
-        super(SuSEProvision, self).__init__()
+    def __init__(self, hutil):
+        super(SuSEProvision, self).__init__(hutil)
         os.system("zypper -n in wget")
 
     def install_lamp(self):
