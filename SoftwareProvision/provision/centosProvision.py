@@ -102,6 +102,9 @@ class centosProvision(AbstractProvision):
         os.system("chkconfig php-fpm on")
         os.system("service php-fpm start")
 
+        # set mysql password
+        os.system("mysqladmin -u root password " + self.mysql_password)
+
         # config nginx
         with open("/etc/nginx/conf.d/default.conf") as f:
             conf = f.read()
