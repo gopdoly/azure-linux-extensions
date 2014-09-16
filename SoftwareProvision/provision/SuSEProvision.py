@@ -97,6 +97,9 @@ class SuSEProvision(AbstractProvision):
         os.system("php-fpm")
         os.system("systemctl start php-fpm.service")
 
+        #set mysql password
+        os.system("mysqladmin -u root password " + self.mysql_password)
+
         # config nginx
         with open("/etc/nginx/nginx.conf") as f:
             conf = f.read()

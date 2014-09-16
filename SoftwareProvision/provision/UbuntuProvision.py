@@ -63,9 +63,8 @@ class UbuntuProvision(AbstractProvision):
 
         os.system("apt-get -y install php5-fpm")
         os.system("apt-get -y install php5-cli php5-cgi php5-mcrypt php5-mysql")
-        self.config_lnmp()
-       
-    def config_lnmp(self):
+
+        # config lnmp
         with open("/etc/nginx/sites-available/default") as f:
             conf = f.read()
         conf = conf.split('\n')
@@ -97,11 +96,11 @@ class UbuntuProvision(AbstractProvision):
             if dir.startswith("java-7-openjdk"):
                 java_home = "/usr/lib/jvm/" + dir
                 break
-        with open("/root/.bashrc", "a") as f:
+        with open("/etc/profile", "a") as f:
             f.write("\nexport JAVA_HOME=" + java_home + '\n')
             f.write("export CLASSPATH=.:${JAVA_HOME}/lib\n")
             f.write("export PATH=${JAVA_HOME}/bin:$PATH\n")
-        os.system("bash")
+        os.system("source /etc/profile")
 
         os.system("apt-get -y install tomcat7")
 
@@ -110,7 +109,8 @@ class UbuntuProvision(AbstractProvision):
 
 if __name__ == '__main__':
     a = UbuntuProvision(None)
+    a.install_javaenv()
 #    a.config_lnmp()
-    a.install_lamp()
-    a.install_wordpress()
-    a.install_phpwind()
+#    a.install_lamp()
+#    a.install_wordpress()
+#    a.install_phpwind()
