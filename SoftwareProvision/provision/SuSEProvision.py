@@ -34,6 +34,10 @@ import Utils.HandlerUtil as Util
 from AbstractProvision import AbstractProvision
 
 class SuSEProvision(AbstractProvision):
+    def __init__(self):
+        super(SuSEProvision, self).__init__()
+        os.system("zypper -n in wget")
+
     def install_lamp(self):
         os.system("zypper -n in apache2")
         os.system("systemctl start apache2.service")
@@ -65,16 +69,19 @@ class SuSEProvision(AbstractProvision):
         os.system("mysqladmin -u root password " + self.mysql_password)
 
         # config firewall
-        with open("/etc/sysconfig/SuSEfirewall2") as f:
-            conf = f.read()
-        conf = conf.split('\n')
-        for i in range(0, len(conf)):
-            if conf[i].startswith("FW_SERVICES_EXT_TCP"):
-                conf[i] = conf[i][:-1] + ' 80"'
-                break
-        with open("/etc/sysconfig/SuSEfirewall2", "w") as f:
-            f.write('\n'.join(conf))
-        os.system("systemctl restart SuSEfirewall2.service")
+        try:
+            with open("/etc/sysconfig/SuSEfirewall2") as f:
+                conf = f.read()
+            conf = conf.split('\n')
+            for i in range(0, len(conf)):
+                if conf[i].startswith("FW_SERVICES_EXT_TCP"):
+                    conf[i] = conf[i][:-1] + ' 80"'
+                    break
+            with open("/etc/sysconfig/SuSEfirewall2", "w") as f:
+                f.write('\n'.join(conf))
+            os.system("systemctl restart SuSEfirewall2.service")
+        except StandardError, e:
+            print "config firewall failed"
  
     def install_lnmp(self):
         os.system("zypper -n in nginx")
@@ -128,20 +135,23 @@ class SuSEProvision(AbstractProvision):
             f.write("<?php\nphpinfo();\n?>")
 
         # config firewall
-        with open("/etc/sysconfig/SuSEfirewall2") as f:
-            conf = f.read()
-        conf = conf.split('\n')
-        for i in range(0, len(conf)):
-            if conf[i].startswith("FW_SERVICES_EXT_TCP"):
-                conf[i] = conf[i][:-1] + ' 80"'
-                break
-        with open("/etc/sysconfig/SuSEfirewall2", "w") as f:
-            f.write('\n'.join(conf))
-        os.system("systemctl restart SuSEfirewall2.service")
-
+        try:
+            with open("/etc/sysconfig/SuSEfirewall2") as f:
+                conf = f.read()
+            conf = conf.split('\n')
+            for i in range(0, len(conf)):
+                if conf[i].startswith("FW_SERVICES_EXT_TCP"):
+                    conf[i] = conf[i][:-1] + ' 80"'
+                    break
+            with open("/etc/sysconfig/SuSEfirewall2", "w") as f:
+                f.write('\n'.join(conf))
+            os.system("systemctl restart SuSEfirewall2.service")
+        except StandardError, e:
+            print "config firewall failed"
+ 
     def install_javaenv(self):
         os.system("zypper -n in java-1_7_0-openjdk")
-        retcode, java_home = waagent.RunGetOutput("find /usr -name java-1.7.0-openjdk | grep /jvm/")
+        java_home = os.popen("find /usr -name java-1.7.0-openjdk | grep /jvm/").read()
         with open("/etc/profile", "a") as f:
             f.write("\nexport JAVA_HOME=" + java_home + '\n')
             f.write("export JRE_HOME=${JAVA_HOME}/jre\n")
@@ -152,7 +162,7 @@ class SuSEProvision(AbstractProvision):
         #install tomcat
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
-        os.system("cd /azuredata && wget -c https://chiy.blob.core.windows.net/softwareprovision/apache-tomcat-7.0.55.tar.gz")
+        os.system("cd /azuredata && wget -c --no-check-certificate https://chiy.blob.core.windows.net/softwareprovision/apache-tomcat-7.0.55.tar.gz")
         os.system("cd /azuredata && tar xvzf apache-tomcat-7.0.55.tar.gz")
         os.system("cd /azuredata && mv apache-tomcat-7.0.55 tomcat")
         os.system("cd /azuredata/tomcat/bin && ./startup.sh")
@@ -164,16 +174,19 @@ class SuSEProvision(AbstractProvision):
         os.system("mysqladmin -u root password " + self.mysql_password)
  
         # config firewall
-        with open("/etc/sysconfig/SuSEfirewall2") as f:
-            conf = f.read()
-        conf = conf.split('\n')
-        for i in range(0, len(conf)):
-            if conf[i].startswith("FW_SERVICES_EXT_TCP"):
-                conf[i] = conf[i][:-1] + ' 8080"'
-                break
-        with open("/etc/sysconfig/SuSEfirewall2", "w") as f:
-            f.write('\n'.join(conf))
-        os.system("systemctl restart SuSEfirewall2.service")
+        try:
+            with open("/etc/sysconfig/SuSEfirewall2") as f:
+                conf = f.read()
+            conf = conf.split('\n')
+            for i in range(0, len(conf)):
+                if conf[i].startswith("FW_SERVICES_EXT_TCP"):
+                    conf[i] = conf[i][:-1] + ' 8080"'
+                    break
+            with open("/etc/sysconfig/SuSEfirewall2", "w") as f:
+                f.write('\n'.join(conf))
+            os.system("systemctl restart SuSEfirewall2.service")
+        except StandardError, e:
+            print "config firewall failed"
  
 if __name__ == '__main__':
     a = SuSEProvision(None)
