@@ -196,7 +196,14 @@ class centosProvision(AbstractProvision):
         # set authority
         os.system("chcon -R -h -t httpd_sys_content_t " + self.http_root + 'phpwind/')
         os.system("/etc/init.d/httpd restart")
+        
+    def install_discuz(self):
+        super(centosProvision, self).install_discuz()
+        # set authority
+        os.system("chcon -R -h -t httpd_sys_content_t " + self.http_root + 'discuz/')
+        os.system("/etc/init.d/httpd restart")
  
+
 if __name__ == '__main__':
     a = centosProvision(None)
     a.install_javaenv()

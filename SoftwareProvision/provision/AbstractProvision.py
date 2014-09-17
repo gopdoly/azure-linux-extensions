@@ -51,6 +51,8 @@ class AbstractProvision(object):
             self.install_wordpress()
         if 'phpwind' in software_list:
             self.install_phpwind()
+        if 'discuz' in software_list:
+            self.install_discuz()
 
     def install_wordpress(self):
         # ensure have already installed lamp
@@ -86,3 +88,17 @@ class AbstractProvision(object):
         os.system("mv /azuredata/phpwind_v9.0_utf8/upload " + self.http_root + "phpwind")
         os.system("rm -r /azuredata/phpwind_v9.0_utf8")
 
+    def install_discuz(self):
+        # ensure have already installed lamp
+        self.install_lamp()
+        if not os.path.isdir("/azuredata"):
+            os.mkdir("/azuredata")
+        os.system("cd /azuredata && wget -c http://download.comsenz.com/DiscuzX/3.2/Discuz_X3.2_SC_UTF8.zip")
+        os.system("cd /azuredata && unzip Discuz_X3.2_SC_UTF8.zip")
+        os.system("mysqladmin -u" + self.mysql_user + " -p" + self.mysql_password + " create discuz")
+        authority = ["config", "data", "uc_client", "uc_server"]
+        os.system("cd /azuredata/upload && chmod a+w -R " + ' '.join(authority))
+        os.system("mv /azuredata/upload " + self.http_root + "discuz")
+        os.system("rm -r /azuredata/readme")
+        os.system("rm -r /azuredata/utility")
+        
