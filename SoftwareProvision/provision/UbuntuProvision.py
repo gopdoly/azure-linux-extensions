@@ -65,24 +65,27 @@ class UbuntuProvision(AbstractProvision):
         os.system("apt-get -y install php5-cli php5-cgi php5-mcrypt php5-mysql")
 
         # config lnmp
-        with open("/etc/nginx/sites-available/default") as f:
-            conf = f.read()
-        conf = conf.split('\n')
-        conf_strip = [s.strip() for s in conf]
-        for i in range(0, len(conf)):
-            if conf[i].strip().startswith("index "):
-                conf[i] = conf[i][:-1] + " index.php;"
-        start = conf_strip.index(r"#location ~ \.php$ {")
-        end = conf_strip[start:].index("#}") + start
-        for i in range(start, end + 1):
-            if '#' in conf[i]:
-                pos = conf[i].index('#')
-                conf[i] = conf[i][:pos] + conf[i][pos+1:]
-            if conf[i].strip().startswith("fastcgi_pass 127.0.0.1"):
-                conf[i] = '#' + conf[i] 
-        with open("/etc/nginx/sites-available/default", "w") as f:
-            f.write('\n'.join(conf))
-
+        try:
+            with open("/etc/nginx/sites-available/default") as f:
+                conf = f.read()
+            conf = conf.split('\n')
+            conf_strip = [s.strip() for s in conf]
+            for i in range(0, len(conf)):
+                if conf[i].strip().startswith("index ") and not "index.php" in conf[i]:
+                    conf[i] = conf[i][:-1] + " index.php;"
+            start = conf_strip.index(r"#location ~ \.php$ {")
+            end = conf_strip[start:].index("#}") + start
+            for i in range(start, end + 1):
+                if '#' in conf[i]:
+                    pos = conf[i].index('#')
+                    conf[i] = conf[i][:pos] + conf[i][pos+1:]
+                if conf[i].strip().startswith("fastcgi_pass 127.0.0.1"):
+                    conf[i] = '#' + conf[i] 
+            with open("/etc/nginx/sites-available/default", "w") as f:
+                f.write('\n'.join(conf))
+        except StandardError, e:
+            print "config lnmp failed"
+    
         for line in conf_strip:
             if line.startswith("root"):
                 self.http_root = line.split(' ')[1].strip(';') + '/'
@@ -114,7 +117,7 @@ if __name__ == '__main__':
     a = UbuntuProvision(None)
 #    a.install_javaenv()
     a.install_lnmp()
-    a.instal_discuz()
+    a.install_discuz()
 #    a.install_lamp()
 #    a.install_wordpress()
 #    a.install_phpwind()
