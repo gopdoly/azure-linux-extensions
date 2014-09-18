@@ -193,4 +193,5 @@ class SuSEProvision(AbstractProvision):
  
 if __name__ == '__main__':
     a = SuSEProvision(None)
-    a.install_javaenv()
+    a.install_lnmp()
+    a.install_wordpress()
