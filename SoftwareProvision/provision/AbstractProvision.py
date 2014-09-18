@@ -55,7 +55,6 @@ class AbstractProvision(object):
             self.install_discuz()
 
     def install_wordpress(self):
-        # ensure have already installed lamp
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
         os.system("mkdir /azuredata")
@@ -75,7 +74,6 @@ class AbstractProvision(object):
         os.system("mv /azuredata/wordpress " + self.http_root)
         
     def install_phpwind(self):
-        # ensure have already installed lamp
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
         os.system("cd /azuredata && wget -c http://www.phpwind.com/downloads/forums/phpwind_v9.0_utf8.zip")
@@ -87,7 +85,6 @@ class AbstractProvision(object):
         os.system("rm -r /azuredata/phpwind_v9.0_utf8")
 
     def install_discuz(self):
-        # ensure have already installed lamp
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
         os.system("cd /azuredata && wget -c http://download.comsenz.com/DiscuzX/3.2/Discuz_X3.2_SC_UTF8.zip")
@@ -99,3 +96,10 @@ class AbstractProvision(object):
         os.system("rm -r /azuredata/readme")
         os.system("rm -r /azuredata/utility")
         
+    def install_phpMyAdmin(self):
+        if not os.path.isdir("/azuredata"):
+            os.mkdir("/azuredata")
+        os.system("cd /azuredata && wget -c http://jaist.dl.sourceforge.net/project/phpmyadmin/phpMyAdmin/4.2.8.1/phpMyAdmin-4.2.8.1-all-languages.zip")
+        os.system("cd /azuredata && unzip phpMyAdmin-4.2.8.1-all-languages.zip")
+        os.system("mv /azuredata/phpMyAdmin-4.2.8.1-all-languages " + self.http_root + "phpMyAdmin")
+
