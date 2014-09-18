@@ -56,7 +56,6 @@ class AbstractProvision(object):
 
     def install_wordpress(self):
         # ensure have already installed lamp
-        self.install_lamp()
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
         os.system("mkdir /azuredata")
@@ -77,7 +76,6 @@ class AbstractProvision(object):
         
     def install_phpwind(self):
         # ensure have already installed lamp
-        self.install_lamp()
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
         os.system("cd /azuredata && wget -c http://www.phpwind.com/downloads/forums/phpwind_v9.0_utf8.zip")
@@ -90,7 +88,6 @@ class AbstractProvision(object):
 
     def install_discuz(self):
         # ensure have already installed lamp
-        self.install_lamp()
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
         os.system("cd /azuredata && wget -c http://download.comsenz.com/DiscuzX/3.2/Discuz_X3.2_SC_UTF8.zip")

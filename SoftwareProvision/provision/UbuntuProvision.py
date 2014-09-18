@@ -69,6 +69,9 @@ class UbuntuProvision(AbstractProvision):
             conf = f.read()
         conf = conf.split('\n')
         conf_strip = [s.strip() for s in conf]
+        for i in range(0, len(conf)):
+            if conf[i].strip().startswith("index ")
+                conf[i] = conf[i][:-1] + " index.php;"
         start = conf_strip.index(r"#location ~ \.php$ {")
         end = conf_strip[start:].index("#}") + start
         for i in range(start, end + 1):
