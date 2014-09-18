@@ -70,7 +70,7 @@ class UbuntuProvision(AbstractProvision):
         conf = conf.split('\n')
         conf_strip = [s.strip() for s in conf]
         for i in range(0, len(conf)):
-            if conf[i].strip().startswith("index ")
+            if conf[i].strip().startswith("index "):
                 conf[i] = conf[i][:-1] + " index.php;"
         start = conf_strip.index(r"#location ~ \.php$ {")
         end = conf_strip[start:].index("#}") + start
@@ -112,8 +112,9 @@ class UbuntuProvision(AbstractProvision):
 
 if __name__ == '__main__':
     a = UbuntuProvision(None)
-    a.install_javaenv()
-#    a.config_lnmp()
+#    a.install_javaenv()
+    a.install_lnmp()
+    a.instal_discuz()
 #    a.install_lamp()
 #    a.install_wordpress()
 #    a.install_phpwind()

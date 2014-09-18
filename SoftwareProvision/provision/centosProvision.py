@@ -111,7 +111,7 @@ class centosProvision(AbstractProvision):
         conf = conf.split('\n')
         conf_strip = [s.strip() for s in conf]
         for i in range(0, len(conf)):
-            if conf[i].strip().startswith("index ")
+            if conf[i].strip().startswith("index "):
                 conf[i] = conf[i][:-1] + " index.php;"
         start = conf_strip.index(r"# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000")
         start = conf_strip[start:].index(r"#location ~ \.php$ {") + start
