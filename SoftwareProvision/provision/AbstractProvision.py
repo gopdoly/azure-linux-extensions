@@ -43,16 +43,16 @@ class AbstractProvision(object):
     def install(self, software_list):
         if 'lamp' in software_list:
             self.install_lamp()
+            others = software_list['lamp'].split(' ')
+            for software in others:
+                getattr(self, 'install_' + software)()
         if 'lnmp' in software_list:
             self.install_lnmp()
+            others = software_list['lnmp'].split(' ')
+            for software in others:
+                getattr(self, 'install_' + software)()
         if 'javaenv' in software_list:
             self.install_javaenv()
-        if 'wordpress' in software_list:
-            self.install_wordpress()
-        if 'phpwind' in software_list:
-            self.install_phpwind()
-        if 'discuz' in software_list:
-            self.install_discuz()
 
     def install_wordpress(self):
         if not os.path.isdir("/azuredata"):
