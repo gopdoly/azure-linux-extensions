@@ -45,12 +45,14 @@ class AbstractProvision(object):
             self.install_lamp()
             others = software_list['lamp'].split(' ')
             for software in others:
-                getattr(self, 'install_' + software)()
+                if hasattr(self, 'install_' + software):
+                    getattr(self, 'install_' + software)()
         if 'lnmp' in software_list:
             self.install_lnmp()
             others = software_list['lnmp'].split(' ')
             for software in others:
-                getattr(self, 'install_' + software)()
+                if hasattr(self, 'install_' + software):
+                    getattr(self, 'install_' + software)()
         if 'javaenv' in software_list:
             self.install_javaenv()
 
