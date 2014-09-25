@@ -34,6 +34,11 @@ import Utils.HandlerUtil as Util
 from AbstractProvision import AbstractProvision
 
 class centosProvision(AbstractProvision):
+    def __init__(self, hutil):
+        super(centosProvision, self).__init__(hutil)
+        os.system("yum -y install wget")
+        os.system("yum -y install unzip")
+
     def install_lamp(self):
         os.system("yum -y install httpd")
         os.system("chkconfig httpd on")
@@ -61,20 +66,23 @@ class centosProvision(AbstractProvision):
         os.system("mysqladmin -u root password " + self.mysql_password)
 
         #config iptables
-        with open("/etc/sysconfig/iptables") as f:
-            conf = f.read()
-        conf = conf.split('\n')
-        for i in range(0, len(conf)):
-            if conf[i].startswith(":OUTPUT ACCEPT"):
-                pos = i
-                break
-        if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT" in conf:
-            conf.insert(pos, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
-        if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT" in conf:
-            conf.insert(pos, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
-        with open("/etc/sysconfig/iptables", "w") as f:
-            f.write("\n".join(conf)) 
-        os.system("service iptables restart")
+        try:
+            with open("/etc/sysconfig/iptables") as f:
+                conf = f.read()
+            conf = conf.split('\n')
+            for i in range(0, len(conf)):
+                if conf[i].startswith(":OUTPUT ACCEPT"):
+                    pos = i
+                    break
+            if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT" in conf:
+                conf.insert(pos, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
+            if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT" in conf:
+                conf.insert(pos, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
+            with open("/etc/sysconfig/iptables", "w") as f:
+                f.write("\n".join(conf)) 
+            os.system("service iptables restart")
+        except StandardError, e:
+            print "config iptables failed"
 
     def install_lnmp(self):
         # install a third-party source
@@ -135,20 +143,23 @@ class centosProvision(AbstractProvision):
         os.system("service nginx restart")
 
         #config iptables
-        with open("/etc/sysconfig/iptables") as f:
-            conf = f.read()
-        conf = conf.split('\n')
-        for i in range(0, len(conf)):
-            if conf[i].startswith(":OUTPUT ACCEPT"):
-                pos = i
-                break
-        if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT" in conf:
-            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
-        if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT" in conf:
-            conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
-        with open("/etc/sysconfig/iptables", "w") as f:
-            f.write("\n".join(conf))
-        os.system("service iptables restart")
+        try:
+            with open("/etc/sysconfig/iptables") as f:
+                conf = f.read()
+            conf = conf.split('\n')
+            for i in range(0, len(conf)):
+                if conf[i].startswith(":OUTPUT ACCEPT"):
+                    pos = i
+                    break
+            if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT" in conf:
+                conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT")
+            if not "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT" in conf:
+                conf.insert(pos + 1, "-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT")
+            with open("/etc/sysconfig/iptables", "w") as f:
+                f.write("\n".join(conf))
+            os.system("service iptables restart")
+        except StandardError, e:
+            print "config iptables failed"
 
     def install_javaenv(self):
         os.system("yum -y install java")
@@ -204,6 +215,12 @@ class centosProvision(AbstractProvision):
         super(centosProvision, self).install_discuz()
         # set authority
         os.system("chcon -R -h -t httpd_sys_content_t " + self.http_root + 'discuz/')
+        os.system("/etc/init.d/httpd restart")
+
+    def install_phpMyAdmin(self):
+        super(centosProvision, self).install_phpMyAdmin()
+        # set authority
+        os.system("chcon -R -h -t httpd_sys_content_t " + self.http_root + 'phpMyAdmin/')
         os.system("/etc/init.d/httpd restart")
  
 
