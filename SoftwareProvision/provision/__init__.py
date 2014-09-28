@@ -23,6 +23,7 @@ import platform
 from UbuntuProvision import UbuntuProvision
 from centosProvision import centosProvision
 from SuSEProvision import SuSEProvision
+from OracleProvision import OracleProvision
 
 # Define the function in case waagent(<2.0.4) doesn't have DistInfo()
 def DistInfo(fullname=0):
