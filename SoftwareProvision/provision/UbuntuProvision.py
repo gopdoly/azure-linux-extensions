@@ -36,12 +36,12 @@ from AbstractProvision import AbstractProvision
 class UbuntuProvision(AbstractProvision):
     def __init__(self, hutil):
         super(UbuntuProvision, self).__init__(hutil)
-        os.system("apt-get update")
-        os.system("apt-get install unzip")
+        waagent.Run("apt-get update")
+        waagent.Run("apt-get install unzip")
 
     def install_lamp(self):
-        os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install mysql-server mysql-client")
-        os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install lamp-server^")
+        waagent.Run("export DEBIAN_FRONTEND=noninteractive && apt-get -y install mysql-server mysql-client")
+        waagent.Run("export DEBIAN_FRONTEND=noninteractive && apt-get -y install lamp-server^")
 
         with open('/etc/apache2/sites-available/' + os.listdir('/etc/apache2/sites-available')[0]) as f:
             conf = f.read()
@@ -52,17 +52,17 @@ class UbuntuProvision(AbstractProvision):
 
         with open(self.http_root + "info.php", "w") as f:
             f.write("<?php\nphpinfo();\n?>")
-        os.system("mysqladmin -u root password " + self.mysql_password)
+        waagent.Run("mysqladmin -u root password " + self.mysql_password)
 
     def install_lnmp(self):
-        os.system("apt-get -y install nginx")
-        os.system("/etc/init.d/nginx start")
+        waagent.Run("apt-get -y install nginx")
+        waagent.Run("/etc/init.d/nginx start")
 
-        os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install mysql-server mysql-client")
-        os.system("mysqladmin -u root password " + self.mysql_password)
+        waagent.Run("export DEBIAN_FRONTEND=noninteractive && apt-get -y install mysql-server mysql-client")
+        waagent.Run("mysqladmin -u root password " + self.mysql_password)
 
-        os.system("apt-get -y install php5-fpm")
-        os.system("apt-get -y install php5-cli php5-cgi php5-mcrypt php5-mysql")
+        waagent.Run("apt-get -y install php5-fpm")
+        waagent.Run("apt-get -y install php5-cli php5-cgi php5-mcrypt php5-mysql")
 
         # config lnmp
         try:
@@ -93,10 +93,10 @@ class UbuntuProvision(AbstractProvision):
         with open(self.http_root + "info.php", "w") as f:
             f.write("<?php\nphpinfo();\n?>")
 
-        os.system("/etc/init.d/nginx restart")
+        waagent.Run("/etc/init.d/nginx restart")
  
     def install_javaenv(self):
-        os.system("apt-get -y install openjdk-7-jdk")
+        waagent.Run("apt-get -y install openjdk-7-jdk")
         java_home = "/usr/lib/jvm/java-7-openjdk"
         for dir in os.listdir("/usr/lib/jvm/"):
             if dir.startswith("java-7-openjdk"):
@@ -106,12 +106,12 @@ class UbuntuProvision(AbstractProvision):
             f.write("\nexport JAVA_HOME=" + java_home + '\n')
             f.write("export CLASSPATH=.:${JAVA_HOME}/lib\n")
             f.write("export PATH=${JAVA_HOME}/bin:$PATH\n")
-        os.system("source /etc/profile")
+        waagent.Run("source /etc/profile")
 
-        os.system("apt-get -y install tomcat7")
+        waagent.Run("apt-get -y install tomcat7")
 
-        os.system("export DEBIAN_FRONTEND=noninteractive && apt-get -y install mysql-server mysql-client")
-        os.system("mysqladmin -u root password " + self.mysql_password)
+        waagent.Run("export DEBIAN_FRONTEND=noninteractive && apt-get -y install mysql-server mysql-client")
+        waagent.Run("mysqladmin -u root password " + self.mysql_password)
 
 if __name__ == '__main__':
     a = UbuntuProvision(None)
