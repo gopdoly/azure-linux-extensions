@@ -60,7 +60,7 @@ class AbstractProvision(object):
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
         waagent.Run("mkdir /azuredata")
-        waagent.Run("cd /azuredata && wget -c http://wordpress.org/latest.tar.gz")
+        waagent.Run("cd /azuredata && wget -c --no-check-certificate http://wordpress.org/latest.tar.gz")
         waagent.Run("cd /azuredata && tar xvzf latest.tar.gz")
         waagent.Run("mysqladmin -u" + self.mysql_user + " -p" + self.mysql_password + " create wordpress")
 
@@ -78,7 +78,7 @@ class AbstractProvision(object):
     def install_phpwind(self):
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
-        waagent.Run("cd /azuredata && wget -c http://www.phpwind.com/downloads/forums/phpwind_v9.0_utf8.zip")
+        waagent.Run("cd /azuredata && wget -c --no-check-certificate http://www.phpwind.com/downloads/forums/phpwind_v9.0_utf8.zip")
         waagent.Run("cd /azuredata && unzip phpwind_v9.0_utf8")
         waagent.Run("mysqladmin -u" + self.mysql_user + " -p" + self.mysql_password + " create phpwind")
         authority = ["attachment", "conf", "data", "html", "src/extensions", "themes", "themes/*", "windid/attachment/"]
@@ -89,7 +89,7 @@ class AbstractProvision(object):
     def install_discuz(self):
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
-        waagent.Run("cd /azuredata && wget -c http://download.comsenz.com/DiscuzX/3.2/Discuz_X3.2_SC_UTF8.zip")
+        waagent.Run("cd /azuredata && wget -c --no-check-certificate http://download.comsenz.com/DiscuzX/3.2/Discuz_X3.2_SC_UTF8.zip")
         waagent.Run("cd /azuredata && unzip Discuz_X3.2_SC_UTF8.zip")
         waagent.Run("mysqladmin -u" + self.mysql_user + " -p" + self.mysql_password + " create discuz")
         authority = ["config", "data", "uc_client", "uc_server"]
@@ -101,7 +101,7 @@ class AbstractProvision(object):
     def install_phpMyAdmin(self):
         if not os.path.isdir("/azuredata"):
             os.mkdir("/azuredata")
-        waagent.Run("cd /azuredata && wget -c http://jaist.dl.sourceforge.net/project/phpmyadmin/phpMyAdmin/4.2.8.1/phpMyAdmin-4.2.8.1-all-languages.zip")
+        waagent.Run("cd /azuredata && wget -c --no-check-certificate http://jaist.dl.sourceforge.net/project/phpmyadmin/phpMyAdmin/4.2.8.1/phpMyAdmin-4.2.8.1-all-languages.zip")
         waagent.Run("cd /azuredata && unzip phpMyAdmin-4.2.8.1-all-languages.zip")
         waagent.Run("mv /azuredata/phpMyAdmin-4.2.8.1-all-languages " + self.http_root + "phpMyAdmin")
 
